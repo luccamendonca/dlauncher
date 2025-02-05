@@ -1,0 +1,17 @@
+executables:
+  chrome:
+    command:
+      - /usr/bin/google-chrome-stable
+      - --new-tab
+  firefox:
+    command:
+      - /usr/bin/firefox
+      - --new-tab
+      - --url
+
+shortcuts:
+  gs:
+    allowedExecutables: ["firefox", "chrome"]
+    # kind: browser_tab
+    # commandTemplate: https://www.google.com
+    commandTemplate: https://www.google.com/search?q=%s
