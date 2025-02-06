@@ -11,7 +11,5 @@ executables:
 
 shortcuts:
   gs:
-    allowedExecutables: ["firefox", "chrome"]
-    # kind: browser_tab
-    # commandTemplate: https://www.google.com
+    supportedExecutables: ["firefox", "chrome"]
     commandTemplate: https://www.google.com/search?q=%s
