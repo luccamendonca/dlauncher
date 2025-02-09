@@ -1,6 +1,7 @@
 package launcher
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -12,18 +13,21 @@ func getFlagValues(cmd *cobra.Command, display CobraDisplay) (Shortcut, Executab
 	s := Shortcut{}
 	e := Executable{}
 	params := []string{}
+	executableName, err := cmd.Flags().GetString("executable-name")
+	if err != nil {
+		return s, e, params, err
+	}
+	if executableName == "" {
+		return s, e, params, fmt.Errorf("The executable-name must be provided.")
+	}
 	shortcutName, err := cmd.Flags().GetString("shortcut-name")
 	if err != nil {
 		return s, e, params, err
 	}
 	if shortcutName == "" {
-		shortcutName = display.Prompt("Shortcut name")
+		shortcutName = display.Prompt(fmt.Sprintf("[%s] Shortcut name", executableName))
 	}
 	params, err = cmd.Flags().GetStringArray("params")
-	if err != nil {
-		return s, e, params, err
-	}
-	executableName, err := cmd.Flags().GetString("executable-name")
 	if err != nil {
 		return s, e, params, err
 	}
@@ -51,11 +55,13 @@ var rootCmd = &cobra.Command{
 		display := NewDisplay(useGUI, args)
 		shortcut, executable, params, err := getFlagValues(cmd, display)
 		if err != nil {
-			display.Panic(err)
+			display.Error(err.Error())
+			panic(err)
 		}
 		err = RunCommand(shortcut, executable, params)
 		if err != nil {
-			display.Panic(err)
+			display.Error(err.Error())
+			panic(err)
 		}
 	},
 }
