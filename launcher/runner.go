@@ -17,9 +17,13 @@ func stringToAny(s []string) []any {
 }
 
 func RunCommand(s Shortcut, e Executable, params []string) error {
-	command := s.CommandTemplate
+	command := s.Template
+	fmt.Println("template")
+	fmt.Println(command)
 	if len(params) > 0 {
 		command = fmt.Sprintf(command, stringToAny(params)...)
+		fmt.Println("parsed")
+		fmt.Println(command)
 	}
 	cmd := exec.Command(e.Command[0], append(e.Command[1:], command)...)
 	currentUser, err := user.Current()

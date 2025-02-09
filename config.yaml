@@ -10,12 +10,9 @@ executables:
       - --url
 
 shortcuts:
-  blank:
-    supportedExecutables: ["firefox", "chrome"]
-    commandTemplate: "about:blank"
   any:
-    supportedExecutables: ["firefox", "chrome"]
-    commandTemplate: "%s"
+    template: "%s"
+  blank:
+    template: "about:blank"
   google:
-    supportedExecutables: ["firefox", "chrome"]
-    commandTemplate: https://www.google.com/search?q=%s
+    template: https://www.google.com/search?q=%s

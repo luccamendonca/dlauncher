@@ -1,17 +1,17 @@
 package launcher
 
 import (
+	"strings"
+
 	"github.com/spf13/cobra"
 )
 
 var CONFIG config
 
-func getFlagValues(cmd *cobra.Command, args []string) (Shortcut, Executable, []string, error) {
+func getFlagValues(cmd *cobra.Command, display CobraDisplay) (Shortcut, Executable, []string, error) {
 	s := Shortcut{}
 	e := Executable{}
 	params := []string{}
-	useGUI, _ := cmd.Flags().GetBool("use-gui")
-	display := NewDisplay(useGUI, args)
 	shortcutName, err := cmd.Flags().GetString("shortcut-name")
 	if err != nil {
 		return s, e, params, err
@@ -36,7 +36,8 @@ func getFlagValues(cmd *cobra.Command, args []string) (Shortcut, Executable, []s
 		return s, e, params, err
 	}
 	if s.HasParams() && len(params) == 0 {
-		params = []string{display.Prompt("Param for template")}
+		promptResponse := display.Prompt("Params for template, comma separated")
+		params = strings.Split(promptResponse, ",")
 	}
 	return s, e, params, nil
 }
@@ -46,7 +47,9 @@ var rootCmd = &cobra.Command{
 	Short: "Runs a shortcut",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		shortcut, executable, params, err := getFlagValues(cmd, args)
+		useGUI, _ := cmd.Flags().GetBool("use-gui")
+		display := NewDisplay(useGUI, args)
+		shortcut, executable, params, err := getFlagValues(cmd, display)
 		if err != nil {
 			panic(err)
 		}

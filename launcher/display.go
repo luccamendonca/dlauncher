@@ -1,8 +1,10 @@
 package launcher
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/alecthomas/repr"
 	"github.com/ncruces/zenity"
@@ -31,7 +33,22 @@ func NewDisplay(useGUI bool, args []string) CobraDisplay {
 
 // DisplayCLI
 func (cli DisplayCLI) Prompt(msg string) string {
-	return msg
+	var s string
+	r := bufio.NewReader(os.Stdin)
+	i := 0
+	for {
+		if i == 0 {
+			msg = msg + "\n"
+		} else {
+			msg = msg + " "
+		}
+		fmt.Fprint(os.Stderr, msg)
+		s, _ = r.ReadString('\n')
+		if s != "" {
+			break
+		}
+	}
+	return strings.TrimSpace(s)
 }
 func (cli DisplayCLI) Error(msg string) {
 	cli.Info(msg)

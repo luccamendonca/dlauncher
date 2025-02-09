@@ -9,7 +9,7 @@ import (
 )
 
 type Shortcut struct {
-	CommandTemplate      string   `yaml:"commandTemplate"`
+	Template             string   `yaml:"template"`
 	SupportedExecutables []string `yaml:"supportedExecutables"`
 }
 
@@ -39,7 +39,7 @@ func (c *config) GetExecutable(executableName string) (Executable, error) {
 }
 
 func (s *Shortcut) HasParams() bool {
-	return strings.Contains(s.CommandTemplate, "")
+	return strings.Contains(s.Template, "")
 }
 
 func ParseConfig() config {
