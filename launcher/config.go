@@ -42,12 +42,29 @@ func (s *Shortcut) HasParams() bool {
 	return strings.Contains(s.Template, "")
 }
 
+func getConfigFilePath() (string, error) {
+	configPath, ok := os.LookupEnv("DLAUNCHER_CONFIG_PATH")
+	if configPath != "" && ok {
+		return configPath, nil
+	}
+	homedir, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	configPath = fmt.Sprintf("%s/.config/dlauncher/config.yaml", homedir)
+	return configPath, nil
+}
+
 func ParseConfig() config {
-	config := config{}
-	configFile, err := os.ReadFile("config.yaml")
+	configPath, err := getConfigFilePath()
 	if err != nil {
 		panic(err)
 	}
+	configFile, err := os.ReadFile(configPath)
+	if err != nil {
+		panic(err)
+	}
+	config := config{}
 	err = yaml.Unmarshal(configFile, &config)
 	if err != nil {
 		panic(err)

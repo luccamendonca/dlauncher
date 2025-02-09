@@ -16,27 +16,19 @@ func stringToAny(s []string) []any {
 	return sAny
 }
 
-func RunCommand(s Shortcut, e Executable, params []string) error {
-	command := s.Template
-	fmt.Println("template")
-	fmt.Println(command)
-	if len(params) > 0 {
-		command = fmt.Sprintf(command, stringToAny(params)...)
-		fmt.Println("parsed")
-		fmt.Println(command)
-	}
-	cmd := exec.Command(e.Command[0], append(e.Command[1:], command)...)
+func prepareCommand(name string, arg ...string) (*exec.Cmd, error) {
+	cmd := exec.Command(name, arg...)
 	currentUser, err := user.Current()
 	if err != nil {
-		return err
+		return cmd, fmt.Errorf("error getting current user: %s", err)
 	}
 	uid, err := strconv.Atoi(currentUser.Uid)
 	if err != nil {
-		return err
+		return cmd, fmt.Errorf("error converting UID: %s", err)
 	}
 	gid, err := strconv.Atoi(currentUser.Gid)
 	if err != nil {
-		return err
+		return cmd, fmt.Errorf("error converting GID: %s", err)
 	}
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Credential: &syscall.Credential{
@@ -44,6 +36,18 @@ func RunCommand(s Shortcut, e Executable, params []string) error {
 			Gid:         uint32(gid),
 			NoSetGroups: true,
 		},
+	}
+	return cmd, nil
+}
+
+func RunCommand(s Shortcut, e Executable, params []string) error {
+	command := s.Template
+	if len(params) > 0 {
+		command = fmt.Sprintf(command, stringToAny(params)...)
+	}
+	cmd, err := prepareCommand(e.Command[0], append(e.Command[1:], command)...)
+	if err != nil {
+		return err
 	}
 	err = cmd.Start()
 	if err != nil {
