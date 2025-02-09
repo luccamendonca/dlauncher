@@ -67,7 +67,11 @@ func (cli DisplayCLI) Panic(err error) {
 
 // DisplayGUI
 func (gui DisplayGUI) Prompt(msg string) string {
-	resp, err := zenity.Entry(msg)
+	resp, err := zenity.Entry(
+		msg,
+		zenity.CancelLabel(""),
+		zenity.OKLabel(""),
+	)
 	if err != nil {
 		zenity.Error(err.Error())
 		os.Exit(1)
