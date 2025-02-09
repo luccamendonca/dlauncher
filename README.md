@@ -21,7 +21,7 @@ First things first, you need to create a config file containing:
 1. The available executables (such as chrome, firefox, or any other browser you want to use) and
 2. Your shortcuts
 
-Use the `config.yaml` no the root dir of this repository as an example.
+Use the `config.yaml` on the root dir of this repository as an example.
 The default location for the config file is `~/.config/dlauncher/dlauncher.yaml`, but you may create it anywhere you want and use the `DLAUNCHER_CONFIG_PATH` env var to tell dlauncher where your config file is located.
 
 ### Running
