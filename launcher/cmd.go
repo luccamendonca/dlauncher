@@ -51,11 +51,11 @@ var rootCmd = &cobra.Command{
 		display := NewDisplay(useGUI, args)
 		shortcut, executable, params, err := getFlagValues(cmd, display)
 		if err != nil {
-			panic(err)
+			display.Panic(err)
 		}
 		err = RunCommand(shortcut, executable, params)
 		if err != nil {
-			panic(err)
+			display.Panic(err)
 		}
 	},
 }

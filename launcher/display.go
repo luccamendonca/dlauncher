@@ -15,6 +15,7 @@ type CobraDisplay interface {
 	Error(msg string)
 	Info(msg string)
 	Debug(params any)
+	Panic(err error)
 }
 
 type DisplayCLI struct {
@@ -59,6 +60,10 @@ func (cli DisplayCLI) Info(msg string) {
 func (cli DisplayCLI) Debug(params any) {
 	repr.Println(params)
 }
+func (cli DisplayCLI) Panic(err error) {
+	cli.Error(err.Error())
+	panic(err)
+}
 
 // DisplayGUI
 func (gui DisplayGUI) Prompt(msg string) string {
@@ -77,4 +82,7 @@ func (gui DisplayGUI) Info(msg string) {
 }
 func (gui DisplayGUI) Debug(params any) {
 	zenity.Info(repr.String(params))
+}
+func (cli DisplayGUI) Panic(err error) {
+	panic(err)
 }

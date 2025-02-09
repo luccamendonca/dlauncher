@@ -39,7 +39,7 @@ func (c *config) GetExecutable(executableName string) (Executable, error) {
 }
 
 func (s *Shortcut) HasParams() bool {
-	return strings.Contains(s.Template, "")
+	return strings.Contains(s.Template, "%s")
 }
 
 func getConfigFilePath() (string, error) {
