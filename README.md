@@ -1,6 +1,6 @@
 # dlauncher
 
-> Nothing to do with `dmenu` [ref], but I couldn't think of a better name.
+> Nothing to do with `dmenu` [[ref](https://tools.suckless.org/dmenu/)], but I couldn't think of a better name.
 
 dlauncher is a (very) simple "launcher" that aims to replicate the bookmark keywords feature brought by Firefox [[ref](https://support.mozilla.org/en-US/kb/bookmarks-firefox#w_how-to-use-keywords-with-bookmarks)], but allowing us to:
 - use it directly from our terminal (or even with a GUI!)
