@@ -24,7 +24,7 @@ First things first, you need to create a config file containing:
 Use the `config.yaml` no the root dir of this repository as an example.
 The default location for the config file is `~/.config/dlauncher/dlauncher.yaml`, but you may create it anywhere you want and use the `DLAUNCHER_CONFIG_PATH` env var to tell dlauncher where your config file is located.
 
-### Running it
+### Running
 
 For testing (or development) purposes, you can run it directly with: `go run main.go` and use the flags as described on the `help` section.
 
