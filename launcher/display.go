@@ -31,7 +31,7 @@ func NewDisplay(useGUI bool, args []string) CobraDisplay {
 
 // DisplayCLI
 func (cli DisplayCLI) Prompt(msg string) string {
-	return cli.args[0]
+	return msg
 }
 func (cli DisplayCLI) Error(msg string) {
 	cli.Info(msg)

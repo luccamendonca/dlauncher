@@ -16,15 +16,7 @@ func stringToAny(s []string) []any {
 	return sAny
 }
 
-func RunCommand(c config, executableName, shortcutName string, params []string) error {
-	e, err := c.getExecutable(executableName)
-	if err != nil {
-		return err
-	}
-	s, err := c.getShortcut(shortcutName)
-	if err != nil {
-		return err
-	}
+func RunCommand(s Shortcut, e Executable, params []string) error {
 	command := s.CommandTemplate
 	if len(params) > 0 {
 		command = fmt.Sprintf(command, stringToAny(params)...)

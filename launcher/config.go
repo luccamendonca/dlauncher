@@ -3,6 +3,7 @@ package launcher
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -21,7 +22,7 @@ type config struct {
 	Shortcuts   map[string]Shortcut   `yaml:"shortcuts"`
 }
 
-func (c *config) getShortcut(shortcutName string) (Shortcut, error) {
+func (c *config) GetShortcut(shortcutName string) (Shortcut, error) {
 	shortcut, ok := c.Shortcuts[shortcutName]
 	if !ok {
 		return Shortcut{}, fmt.Errorf("the shortcut does not exist: %s", shortcutName)
@@ -29,12 +30,16 @@ func (c *config) getShortcut(shortcutName string) (Shortcut, error) {
 	return shortcut, nil
 }
 
-func (c *config) getExecutable(executableName string) (Executable, error) {
+func (c *config) GetExecutable(executableName string) (Executable, error) {
 	executable, ok := c.Executables[executableName]
 	if !ok {
 		return Executable{}, fmt.Errorf("the executable does not exist: %s", executableName)
 	}
 	return executable, nil
+}
+
+func (s *Shortcut) HasParams() bool {
+	return strings.Contains(s.CommandTemplate, "")
 }
 
 func ParseConfig() config {
