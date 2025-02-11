@@ -38,6 +38,14 @@ func (c *config) GetExecutable(executableName string) (Executable, error) {
 	return executable, nil
 }
 
+func (c *config) AddShortcut(name string, s Shortcut) error {
+
+}
+
+func (c *config) updateFile() error {
+	getConfigFilePath
+}
+
 func (s *Shortcut) HasParams() bool {
 	return strings.Contains(s.Template, "%s")
 }
