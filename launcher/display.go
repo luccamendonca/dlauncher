@@ -52,7 +52,7 @@ func (cli DisplayCLI) Prompt(msg string) string {
 	return strings.TrimSpace(s)
 }
 func (cli DisplayCLI) Error(msg string) {
-	cli.Info(msg)
+	cli.Info(fmt.Sprintf("error: %s", msg))
 }
 func (cli DisplayCLI) Info(msg string) {
 	fmt.Println(msg)
@@ -61,7 +61,6 @@ func (cli DisplayCLI) Debug(params any) {
 	repr.Println(params)
 }
 func (cli DisplayCLI) Panic(err error) {
-	cli.Error(err.Error())
 	panic(err)
 }
 
