@@ -2,12 +2,13 @@ package launcher
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 )
 
-var CONFIG config
+var CONFIG Config
 
 func getFlagValues(cmd *cobra.Command, display CobraDisplay) (Shortcut, Executable, []string, error) {
 	s := Shortcut{}
@@ -18,7 +19,7 @@ func getFlagValues(cmd *cobra.Command, display CobraDisplay) (Shortcut, Executab
 		return s, e, params, err
 	}
 	if executableName == "" {
-		return s, e, params, fmt.Errorf("The executable-name must be provided.")
+		return s, e, params, fmt.Errorf("the executable-name must be provided")
 	}
 	shortcutName, err := cmd.Flags().GetString("shortcut-name")
 	if err != nil {
@@ -51,6 +52,13 @@ var rootCmd = &cobra.Command{
 	Short: "Runs a shortcut",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		var err error
+		CONFIG, err = ParseConfig()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
 		useGUI, _ := cmd.Flags().GetBool("use-gui")
 		display := NewDisplay(useGUI, args)
 		shortcut, executable, params, err := getFlagValues(cmd, display)
@@ -66,12 +74,31 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Creates a default configuration file",
+	Run: func(cmd *cobra.Command, args []string) {
+		err := CreateDefaultConfig()
+		if err != nil {
+			fmt.Printf("Error creating config file: %v\n", err)
+			os.Exit(1)
+		}
+		configPath, err := getConfigFilePath()
+		if err != nil {
+			fmt.Println("Default configuration file created successfully.")
+		} else {
+			fmt.Printf("Default configuration file created successfully at %s\n", configPath)
+		}
+
+	},
+}
+
 func init() {
 	rootCmd.Flags().BoolP("use-gui", "g", false, "Uses GUI instead of CLI")
 	rootCmd.Flags().StringP("executable-name", "e", "", "The program that should execute your command template.")
 	rootCmd.Flags().StringP("shortcut-name", "s", "", "The name of the shortcut.")
 	rootCmd.Flags().StringArrayP("params", "p", []string{}, "(optional) The params for the command.")
-	CONFIG = ParseConfig()
+	rootCmd.AddCommand(initCmd)
 }
 
 func Execute() {
