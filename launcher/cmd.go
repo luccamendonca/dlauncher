@@ -66,6 +66,12 @@ func addCmdGetFlagValues(cmd *cobra.Command, display CobraDisplay) (string, Shor
 	return name, s, nil
 }
 
+var rootCmd = &cobra.Command{
+	Use:   "",
+	Short: "Go and launcht it!",
+	Args:  cobra.NoArgs,
+}
+
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Runs a shortcut",
@@ -117,7 +123,8 @@ func init() {
 	addCmd.Flags().StringP("shortcut-name", "s", "", "The name of the shortcut.")
 	addCmd.Flags().StringP("shortcut-template", "t", "", "The template for the shortcut.")
 
-	runCmd.AddCommand(addCmd)
+	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(addCmd)
 
 	var err error
 	CONFIG, err = ParseConfig()
