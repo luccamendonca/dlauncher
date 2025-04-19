@@ -2,12 +2,17 @@ package launcher
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 )
 
 var CONFIG config
+
+func fallbackDisplay() CobraDisplay {
+	return NewDisplay(false, os.Args[1:])
+}
 
 func runCmdGetFlagValues(cmd *cobra.Command, display CobraDisplay) (Shortcut, Executable, []string, error) {
 	s := Shortcut{}
@@ -129,7 +134,8 @@ func init() {
 	var err error
 	CONFIG, err = ParseConfig()
 	if err != nil {
-		panic(err)
+		fallbackDisplay().Error(fmt.Sprintf("Error loading configuration: %v", err))
+		os.Exit(1)
 	}
 }
 

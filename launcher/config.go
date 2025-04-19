@@ -1,7 +1,9 @@
 package launcher
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"strings"
 
@@ -65,30 +67,36 @@ func (s *Shortcut) HasParams() bool {
 
 func getConfigFilePath() (string, error) {
 	configPath, ok := os.LookupEnv("DLAUNCHER_CONFIG_PATH")
-	if configPath != "" && ok {
+	if ok && configPath != "" {
 		return configPath, nil
 	}
 	homedir, err := os.UserHomeDir()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to get user home directory: %w", err)
 	}
 	configPath = fmt.Sprintf("%s/.config/dlauncher/config.yaml", homedir)
 	return configPath, nil
 }
 
 func ParseConfig() (config, error) {
-	config := config{}
+	cfg := config{}
 	configPath, err := getConfigFilePath()
 	if err != nil {
-		return config, err
+		return cfg, fmt.Errorf("failed to determine config file path: %w", err)
 	}
+
 	configFile, err := os.ReadFile(configPath)
 	if err != nil {
-		return config, err
+		if errors.Is(err, fs.ErrNotExist) {
+			return cfg, fmt.Errorf("configuration file not found at '%s'", configPath)
+		}
+		return cfg, fmt.Errorf("failed to read config file '%s': %w", configPath, err)
 	}
-	err = yaml.Unmarshal(configFile, &config)
+
+	err = yaml.Unmarshal(configFile, &cfg)
 	if err != nil {
-		return config, err
+		return cfg, fmt.Errorf("failed to parse config file '%s': %w", configPath, err)
 	}
-	return config, nil
+
+	return cfg, nil
 }
