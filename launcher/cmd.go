@@ -113,6 +113,26 @@ var addCmd = &cobra.Command{
 	},
 }
 
+var listCmd = &cobra.Command{
+	Use:   "list",
+	Short: "Lists all configured shortcuts",
+	Args:  cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+		useGUI, _ := cmd.Flags().GetBool("use-gui")
+		display := NewDisplay(useGUI, args)
+		if len(CONFIG.Shortcuts) == 0 {
+			display.Info("No shortcuts configured.")
+			return
+		}
+		var sb strings.Builder
+		sb.WriteString("Configured shortcuts:\n")
+		for name, shortcut := range CONFIG.Shortcuts {
+			sb.WriteString(fmt.Sprintf("  %s: %s\n", name, shortcut.Template))
+		}
+		display.Info(sb.String())
+	},
+}
+
 func init() {
 	runCmd.Flags().BoolP("use-gui", "g", false, "Uses GUI instead of CLI")
 	runCmd.Flags().StringP("executable-name", "e", "", "The program that should execute your command template.")
@@ -123,8 +143,11 @@ func init() {
 	addCmd.Flags().StringP("shortcut-name", "s", "", "The name of the shortcut.")
 	addCmd.Flags().StringP("shortcut-template", "t", "", "The template for the shortcut.")
 
+	listCmd.Flags().BoolP("use-gui", "g", false, "Uses GUI instead of CLI")
+
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(addCmd)
+	rootCmd.AddCommand(listCmd)
 
 	var err error
 	CONFIG, err = ParseConfig()
