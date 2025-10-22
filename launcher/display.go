@@ -12,6 +12,7 @@ import (
 
 type CobraDisplay interface {
 	Prompt(msg string) string
+	PromptMultiline(msg string) string
 	Error(msg string)
 	Info(msg string)
 	Debug(params any)
@@ -51,6 +52,19 @@ func (cli DisplayCLI) Prompt(msg string) string {
 	}
 	return strings.TrimSpace(s)
 }
+func (cli DisplayCLI) PromptMultiline(msg string) string {
+	fmt.Fprintf(os.Stderr, "%s (enter empty line when done):\n", msg)
+	var lines []string
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "" {
+			break
+		}
+		lines = append(lines, line)
+	}
+	return strings.Join(lines, "\n")
+}
 func (cli DisplayCLI) Error(msg string) {
 	cli.Info(fmt.Sprintf("error: %s", msg))
 }
@@ -68,6 +82,18 @@ func (cli DisplayCLI) Panic(err error) {
 func (gui DisplayGUI) Prompt(msg string) string {
 	resp, err := zenity.Entry(
 		msg,
+		zenity.CancelLabel(""),
+		zenity.OKLabel(""),
+	)
+	if err != nil {
+		zenity.Error(err.Error())
+		os.Exit(1)
+	}
+	return resp
+}
+func (gui DisplayGUI) PromptMultiline(msg string) string {
+	resp, err := zenity.Entry(
+		msg+"\n(separate links with newlines)",
 		zenity.CancelLabel(""),
 		zenity.OKLabel(""),
 	)

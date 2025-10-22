@@ -59,3 +59,22 @@ func RunCommand(s Shortcut, e Executable, params []string) error {
 	}
 	return nil
 }
+
+// RunMultipleCommands opens multiple links in separate browser tabs
+func RunMultipleCommands(links []string, e Executable) error {
+	for _, link := range links {
+		cmd, err := prepareCommand(e.Command[0], append(e.Command[1:], link)...)
+		if err != nil {
+			return fmt.Errorf("failed to prepare command for link %s: %v", link, err)
+		}
+		err = cmd.Start()
+		if err != nil {
+			return fmt.Errorf("failed to start command for link %s: %v", link, err)
+		}
+		err = cmd.Process.Release()
+		if err != nil {
+			return fmt.Errorf("failed to release process for link %s: %v", link, err)
+		}
+	}
+	return nil
+}

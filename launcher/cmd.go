@@ -66,6 +66,41 @@ func addCmdGetFlagValues(cmd *cobra.Command, display CobraDisplay) (string, Shor
 	return name, s, nil
 }
 
+func multiRunCmdGetFlagValues(cmd *cobra.Command, display CobraDisplay) (Executable, []string, error) {
+	e := Executable{}
+	executableName, err := cmd.Flags().GetString("executable-name")
+	if err != nil {
+		return e, nil, err
+	}
+	if executableName == "" {
+		return e, nil, fmt.Errorf("the executable-name must be provided")
+	}
+
+	linksInput, err := cmd.Flags().GetString("links")
+	if err != nil {
+		return e, nil, err
+	}
+	if linksInput == "" {
+		linksInput = display.PromptMultiline("Enter links")
+	}
+
+	e, err = CONFIG.GetExecutable(executableName)
+	if err != nil {
+		return e, nil, err
+	}
+
+	links := strings.Split(strings.TrimSpace(linksInput), "\n")
+	var cleanLinks []string
+	for _, link := range links {
+		link = strings.TrimSpace(link)
+		if link != "" {
+			cleanLinks = append(cleanLinks, link)
+		}
+	}
+
+	return e, cleanLinks, nil
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "",
 	Short: "Go and launcht it!",
@@ -85,6 +120,32 @@ var runCmd = &cobra.Command{
 			return
 		}
 		err = RunCommand(shortcut, executable, params)
+		if err != nil {
+			display.Error(err.Error())
+			return
+		}
+	},
+}
+
+var multiRunCmd = &cobra.Command{
+	Use:   "multi-run",
+	Short: "Opens multiple links in new browser tabs",
+	Args:  cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+		useGUI, _ := cmd.Flags().GetBool("use-gui")
+		display := NewDisplay(useGUI, args)
+		executable, links, err := multiRunCmdGetFlagValues(cmd, display)
+		if err != nil {
+			display.Error(err.Error())
+			return
+		}
+
+		if len(links) == 0 {
+			display.Error("No valid links provided")
+			return
+		}
+
+		err = RunMultipleCommands(links, executable)
 		if err != nil {
 			display.Error(err.Error())
 			return
@@ -143,10 +204,15 @@ func init() {
 	addCmd.Flags().StringP("shortcut-name", "s", "", "The name of the shortcut.")
 	addCmd.Flags().StringP("shortcut-template", "t", "", "The template for the shortcut.")
 
+	multiRunCmd.Flags().BoolP("use-gui", "g", false, "Uses GUI instead of CLI")
+	multiRunCmd.Flags().StringP("executable-name", "e", "", "The browser executable to use (e.g., chrome, firefox).")
+	multiRunCmd.Flags().StringP("links", "l", "", "Links separated by newlines to open in new tabs.")
+
 	listCmd.Flags().BoolP("use-gui", "g", false, "Uses GUI instead of CLI")
 
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(addCmd)
+	rootCmd.AddCommand(multiRunCmd)
 	rootCmd.AddCommand(listCmd)
 
 	var err error
