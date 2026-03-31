@@ -24,12 +24,20 @@ func runCmdGetFlagValues(cmd *cobra.Command, display CobraDisplay) (Shortcut, Ex
 	if err != nil {
 		return s, e, params, err
 	}
-	if shortcutName == "" {
-		shortcutName = display.Prompt(fmt.Sprintf("[%s] Shortcut name", executableName))
-	}
 	params, err = cmd.Flags().GetStringArray("params")
 	if err != nil {
 		return s, e, params, err
+	}
+	if shortcutName == "" {
+		promptResponse := display.Prompt(fmt.Sprintf("[%s] <shortcut> [value]", executableName))
+		if spaceIdx := strings.Index(promptResponse, " "); spaceIdx != -1 {
+			shortcutName = promptResponse[:spaceIdx]
+			if len(params) == 0 {
+				params = []string{promptResponse[spaceIdx+1:]}
+			}
+		} else {
+			shortcutName = promptResponse
+		}
 	}
 	s, err = CONFIG.GetShortcut(shortcutName)
 	if err != nil {
@@ -40,8 +48,7 @@ func runCmdGetFlagValues(cmd *cobra.Command, display CobraDisplay) (Shortcut, Ex
 		return s, e, params, err
 	}
 	if s.HasParams() && len(params) == 0 {
-		promptResponse := display.Prompt("Params for template, comma separated")
-		params = strings.Split(promptResponse, ",")
+		params = []string{display.Prompt("Value")}
 	}
 	return s, e, params, nil
 }
@@ -55,7 +62,7 @@ func addCmdGetFlagValues(cmd *cobra.Command, display CobraDisplay) (string, Shor
 	if name == "" {
 		name = display.Prompt("Shortcut name")
 	}
-	s.Template, err = cmd.Flags().GetString("shortcut-name")
+	s.Template, err = cmd.Flags().GetString("shortcut-template")
 	if err != nil {
 		return name, s, err
 	}

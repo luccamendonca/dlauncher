@@ -1,10 +1,10 @@
+//go:build linux || darwin
+
 package launcher
 
 import (
 	"fmt"
 	"os/exec"
-	"os/user"
-	"strconv"
 	"syscall"
 )
 
@@ -18,24 +18,8 @@ func stringToAny(s []string) []any {
 
 func prepareCommand(name string, arg ...string) (*exec.Cmd, error) {
 	cmd := exec.Command(name, arg...)
-	currentUser, err := user.Current()
-	if err != nil {
-		return cmd, fmt.Errorf("error getting current user: %s", err)
-	}
-	uid, err := strconv.Atoi(currentUser.Uid)
-	if err != nil {
-		return cmd, fmt.Errorf("error converting UID: %s", err)
-	}
-	gid, err := strconv.Atoi(currentUser.Gid)
-	if err != nil {
-		return cmd, fmt.Errorf("error converting GID: %s", err)
-	}
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Credential: &syscall.Credential{
-			Uid:         uint32(uid),
-			Gid:         uint32(gid),
-			NoSetGroups: true,
-		},
+		Setsid: true,
 	}
 	return cmd, nil
 }

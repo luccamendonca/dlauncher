@@ -1,13 +1,27 @@
+# Linux executables
+# executables:
+#   chrome:
+#     command:
+#       - /usr/bin/google-chrome-stable
+#       - --new-tab
+#   firefox:
+#     command:
+#       - /usr/bin/firefox
+#       - --new-tab
+#       - --url
+
+# macOS executables
 executables:
   chrome:
     command:
-      - /usr/bin/google-chrome-stable
-      - --new-tab
+      - open
+      - -a
+      - Google Chrome
   firefox:
     command:
-      - /usr/bin/firefox
-      - --new-tab
-      - --url
+      - open
+      - -a
+      - Firefox
 
 shortcuts:
   any:

@@ -9,11 +9,11 @@ dlauncher is a (very) simple "launcher" that aims to replicate the bookmark keyw
 
 ## Dependencies
 
-- Whatever [Zenity](https://github.com/ncruces/zenity) depends on.
-On Linux you need either `zenity`, `matedialog` or [qarma](https://github.com/luebking/qarma), but if you're running any Linux distro that has a GUI (i.e. _any_ DE), chances are that you already have at least one of them.
-  - If you don't have one of the above, just install it and you should be good to go (via `apt`, `yum`, `yay`, etc.)
-
 - go >= 1.23.4
+
+- Whatever [Zenity](https://github.com/ncruces/zenity) depends on, based on your OS:
+  - **Linux**: you need either `zenity`, `matedialog` or [qarma](https://github.com/luebking/qarma). If you're running any Linux distro with a DE, chances are you already have at least one of them. If not, install it via `apt`, `yum`, `yay`, etc.
+  - **macOS**: no extra dependencies — Zenity uses native macOS dialogs out of the box.
 
 ## How it works
 
@@ -22,7 +22,20 @@ First things first, you need to create a config file containing:
 2. Your shortcuts
 
 Use the `config.yaml` on the root dir of this repository as an example.
-The default location for the config file is `~/.config/dlauncher/dlauncher.yaml`, but you may create it anywhere you want and use the `DLAUNCHER_CONFIG_PATH` env var to tell dlauncher where your config file is located.
+The default location for the config file is `~/.config/dlauncher/config.yaml`, but you may create it anywhere you want and use the `DLAUNCHER_CONFIG_PATH` env var to tell dlauncher where your config file is located.
+
+> **macOS note**: browser executables should use the `open` command. See the commented Linux examples in the provided `config.yaml` for reference.
+>
+> Example macOS executables:
+> ```yaml
+> executables:
+>   chrome:
+>     command: [open, -a, "Google Chrome"]
+>   firefox:
+>     command: [open, -a, Firefox]
+>   default:
+>     command: [open]
+> ```
 
 ### Running
 
@@ -68,27 +81,34 @@ Display all configured shortcuts.
 
 #### Single URL Examples
 
-1. Opens the `any` shortcut using the `firefox` executable. Asks for params, since the shortcut's `template` contains one or more `%s`, indicating that it is an actual template.
+1. Opens the `any` shortcut using the `firefox` executable. Since no `-s` flag is given, a single prompt asks for both the shortcut and the value together.
 ```shell
-$ dlauncher run -e firefox -s any
-Params for template, comma separated
-https://google.com/
+$ dlauncher run -e firefox
+[firefox] <shortcut> [value]
+any https://google.com/
 ```
-The result is that a new tab is opened on Firefox on the Google search page.
+The result is that a new tab is opened on Firefox on the Google homepage.
 
-2. Opens the `google` shortcut using the `chrome` executable. Asks for params.
+2. Opens the `google` shortcut using the `chrome` executable using the combined prompt.
 ```shell
-$ dlauncher run -e chrome -s google
-Params for template, comma separated
-my search
+$ dlauncher run -e chrome
+[chrome] <shortcut> [value]
+google my search
 ```
-The result is that a new tab is opened on Chrome with the following URL: `https://www.google.com/search?q=my%20search`
+The result is that a new tab is opened on Chrome with the following URL: `https://www.google.com/search?q=my search`
 
-3. Opens the `blank` shortcut using the `chrome` executable.
+3. Opens the `blank` shortcut using the `chrome` executable — no value needed since the template has no `%s`.
 ```shell
-$ dlauncher run -e chrome -s blank
+$ dlauncher run -e chrome
+[chrome] <shortcut> [value]
+blank
 ```
 The result is that a new tab is opened on Chrome with the following URL: `about:blank`
+
+4. You can still pass flags directly to skip the prompt entirely:
+```shell
+$ dlauncher run -e chrome -s google -p "my search"
+```
 
 #### Multiple URLs Examples
 
