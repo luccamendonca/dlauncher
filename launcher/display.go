@@ -10,6 +10,8 @@ import (
 	"github.com/ncruces/zenity"
 )
 
+const zenityTitle = "dlauncher"
+
 type CobraDisplay interface {
 	Prompt(msg string) string
 	PromptMultiline(msg string) string
@@ -82,35 +84,41 @@ func (cli DisplayCLI) Panic(err error) {
 func (gui DisplayGUI) Prompt(msg string) string {
 	resp, err := zenity.Entry(
 		msg,
-		zenity.CancelLabel(""),
-		zenity.OKLabel(""),
+		zenity.Title(zenityTitle),
+		zenity.OKLabel("OK"),
+		zenity.CancelLabel("Cancel"),
 	)
 	if err != nil {
-		zenity.Error(err.Error())
+		_ = zenity.Error(err.Error(), zenity.Title(zenityTitle))
 		os.Exit(1)
 	}
 	return resp
 }
+
 func (gui DisplayGUI) PromptMultiline(msg string) string {
 	resp, err := zenity.Entry(
-		msg+"\n(separate links with newlines)",
-		zenity.CancelLabel(""),
-		zenity.OKLabel(""),
+		msg,
+		zenity.Title(zenityTitle+" — one link per line"),
+		zenity.OKLabel("OK"),
+		zenity.CancelLabel("Cancel"),
 	)
 	if err != nil {
-		zenity.Error(err.Error())
+		_ = zenity.Error(err.Error(), zenity.Title(zenityTitle))
 		os.Exit(1)
 	}
 	return resp
 }
+
 func (gui DisplayGUI) Error(msg string) {
-	zenity.Error(msg)
+	_ = zenity.Error(msg, zenity.Title(zenityTitle))
 }
+
 func (gui DisplayGUI) Info(msg string) {
-	zenity.Info(msg)
+	_ = zenity.Info(msg, zenity.Title(zenityTitle))
 }
+
 func (gui DisplayGUI) Debug(params any) {
-	zenity.Info(repr.String(params))
+	_ = zenity.Info(repr.String(params), zenity.Title(zenityTitle))
 }
 func (cli DisplayGUI) Panic(err error) {
 	panic(err)
